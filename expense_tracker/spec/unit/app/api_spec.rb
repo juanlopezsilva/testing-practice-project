@@ -17,6 +17,40 @@ module ExpenseTracker
 
     let(:ledger) { instance_double('ExpenseTracker::Ledger') }
 
+    describe 'GET /expenses/:date' do
+      context 'when expenses exist on the given date' do
+        before do
+          allow(ledger).to receive(:expenses_on)
+            .with('2017-06-12')
+            .and_return({ 'some' => 'data' })
+        end
+
+        it 'returns the expense records as JSON' do
+          get '/expenses/2017-06-12'
+          expect(parsed_response_body).to eq({ 'some' => 'data' })
+        end
+        it 'responds with a 200 (OK)' do
+          get '/expenses/2017-06-12'
+          expect(last_response.status).to eq(200)
+        end
+      end
+      context 'when there are no expenses on the given date' do
+        before do
+          allow(ledger).to receive(:expenses_on)
+            .with('2017-06-12')
+            .and_return([])
+        end
+        it 'returns an empty array as JSON' do
+          get '/expenses/2017-06-12'
+          expect(parsed_response_body).to eq([])
+        end
+        it 'responds with a 200 (OK)' do
+          get '/expenses/2017-06-12'
+          expect(last_response.status).to eq(200)
+        end
+      end
+    end
+
     describe 'POST /expenses' do
       context 'when the expense is successfully recorded' do
         let(:expense) { { 'some' => 'data' } }
