@@ -15,25 +15,21 @@ module ExpenseTracker
 
     describe 'POST /expenses' do
       context 'when the expense is successfully recorded' do
-        it 'returns the expense id' do
-          expense = { 'some' => 'data' }
+        let(:expense) { { 'some' => 'data' } }
 
+        before do
           allow(ledger).to receive(:record)
             .with(expense)
             .and_return(RecordResult.new(true, 417, nil))
+        end
 
+        it 'returns the expense id' do
           post '/expenses', JSON.generate(expense)
-
           parsed = JSON.parse(last_response.body)
           expect(parsed).to include('expense_id' => 417)
         end
+
         it 'responds with a 200 (OK)' do
-          expense = { 'some' => 'data' }
-
-          allow(ledger).to receive(:record)
-            .with(expense)
-            .and_return(RecordResult.new(true, 417, nil))
-
           post '/expenses', JSON.generate(expense)
           expect(last_response.status).to eq(200)
         end
